@@ -92,6 +92,8 @@ class _CardState extends State<_Card> {
                   ),
                 ),
               ),
+
+
               Align(
                 alignment: AlignmentGeometry.bottomRight,
                 child: Padding(
