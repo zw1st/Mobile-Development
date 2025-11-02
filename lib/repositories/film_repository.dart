@@ -12,18 +12,22 @@ class FilmRepository extends ApiInterface {
   static const String _baseUrl = 'https://www.omdbapi.com/?apikey=c8194d3e';
 
   @override
-  Future<List<CardData>?> loadData() async{
-    try{
-      const String url = '$_baseUrl&s=america';
+  Future<List<CardData>?> loadData({s}) async {
+    try {
+      const String url = _baseUrl;
 
-      final Response<dynamic> response = await _dio.get<Map<dynamic, dynamic>>(url);
+      final Response<dynamic> response = await _dio.get<Map<dynamic, dynamic>>(
+        url,
+        queryParameters: s != null ? {"s": s} : {"s": "america"},
+      );
 
-      final FilmsDto dto = FilmsDto.fromJson(response.data as Map<String, dynamic>);
-      final List<CardData>? data = dto.search?.map((e) => e.toDomain()).toList();
+      final FilmsDto dto =
+          FilmsDto.fromJson(response.data as Map<String, dynamic>);
+      final List<CardData>? data =
+          dto.search?.map((e) => e.toDomain()).toList();
       return data;
-    } on DioException catch (e){
+    } on DioException catch (e) {
       return null;
     }
-
   }
 }

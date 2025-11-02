@@ -1,6 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_dev/components/utils/debounce.dart';
 import 'package:mobile_dev/presentation/details_page/details_page.dart';
+import 'package:mobile_dev/presentation/home_page/bloc/bloc.dart';
+import 'package:mobile_dev/presentation/home_page/bloc/events.dart';
+import 'package:mobile_dev/presentation/home_page/bloc/state.dart';
 import 'package:mobile_dev/repositories/film_repository.dart';
 import 'package:mobile_dev/repositories/mock_repository.dart';
 
@@ -30,31 +35,71 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class Body extends StatelessWidget {
+class Body extends StatefulWidget {
   const Body({super.key});
 
   @override
+  State<Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
+  final searchController = TextEditingController();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HomeBloc>().add(const HomeLoadDataEvent());
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final data = FilmRepository().loadData();
     return Center(
-      child: FutureBuilder(
-        future: data,
-        builder: (context, snapshot) => SingleChildScrollView(
-          child: snapshot.hasData
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:
-                      snapshot.data?.map((data) {
-                        return _Card.fromData(
-                          data,
-                          onLike: (String title, bool isLiked) =>
-                              _showSnackBar(context, title, isLiked),
-                          onTap: () => _navToDetails(context, data),
-                        );
-                      }).toList() ??
-                      [],
-                )
-              : const CircularProgressIndicator(),
+      child: Padding(
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(12),
+              child: CupertinoSearchTextField(
+                controller: searchController,
+                onChanged: (search){
+                  Debounce.run(() => context.read<HomeBloc>().add(HomeLoadDataEvent(search: search)));
+                },
+              ),
+            ),
+            BlocBuilder<HomeBloc, HomeState>(
+              builder: (context, state) => !state.isLoading
+                  ? Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _onRefresh,
+                        child: ListView.builder(  
+                          padding: EdgeInsets.zero,
+                          itemCount: state.data?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            final data = state.data?[index];
+                            return data != null
+                                ? _Card.fromData(
+                                    data,
+                                    onLike: (String title, bool isLiked) =>
+                                        _showSnackBar(context, title, isLiked),
+                                    onTap: () => _navToDetails(context, data),
+                                  )
+                                : const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                    )
+                  : const CircularProgressIndicator(),
+            ),
+          ],
         ),
       ),
     );
@@ -80,5 +125,10 @@ class Body extends StatelessWidget {
         ),
       );
     });
+  }
+
+  Future<void> _onRefresh(){
+    context.read<HomeBloc>().add(HomeLoadDataEvent(search: searchController.text));
+    return Future.value(null);
   }
 }
