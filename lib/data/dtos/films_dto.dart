@@ -2,10 +2,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'films_dto.g.dart';
 
-
 @JsonSerializable(createToJson: false)
-class FilmsDto{
-
+class FilmsDto {
   @JsonKey(name: "Search")
   final List<FilmDataDto>? search;
 
@@ -15,7 +13,7 @@ class FilmsDto{
 }
 
 @JsonSerializable(createToJson: false)
-class FilmDataDto{
+class FilmDataDto {
   final String? imdbID;
   @JsonKey(name: "Title")
   final String? title;
@@ -23,7 +21,6 @@ class FilmDataDto{
   final String? type;
   @JsonKey(name: "Poster")
   final String? imageUrl;
-
 
   const FilmDataDto({this.imdbID, this.title, this.type, this.imageUrl});
 

@@ -21,10 +21,8 @@ class FilmRepository extends ApiInterface {
         queryParameters: s != null ? {"s": s} : {"s": "america"},
       );
 
-      final FilmsDto dto =
-          FilmsDto.fromJson(response.data as Map<String, dynamic>);
-      final List<CardData>? data =
-          dto.search?.map((e) => e.toDomain()).toList();
+      final FilmsDto dto = FilmsDto.fromJson(response.data as Map<String, dynamic>);
+      final List<CardData>? data = dto.search?.map((e) => e.toDomain()).toList();
       return data;
     } on DioException catch (e) {
       return null;

@@ -1,0 +1,9 @@
+{
+    "@@locale": "en",
+
+    "search": "Search",
+    "liked": "Liked",
+    "disliked": "Disliked",
+
+    "arbEnding": "str"
+}

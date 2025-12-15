@@ -7,14 +7,14 @@ part of 'films_dto.dart';
 // **************************************************************************
 
 FilmsDto _$FilmsDtoFromJson(Map<String, dynamic> json) => FilmsDto(
-  search: (json['Search'] as List<dynamic>?)
-      ?.map((e) => FilmDataDto.fromJson(e as Map<String, dynamic>))
-      .toList(),
-);
+      search: (json['Search'] as List<dynamic>?)
+          ?.map((e) => FilmDataDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
 
 FilmDataDto _$FilmDataDtoFromJson(Map<String, dynamic> json) => FilmDataDto(
-  imdbID: json['imdbID'] as String?,
-  title: json['Title'] as String?,
-  type: json['Type'] as String?,
-  imageUrl: json['Poster'] as String?,
-);
+      imdbID: json['imdbID'] as String?,
+      title: json['Title'] as String?,
+      type: json['Type'] as String?,
+      imageUrl: json['Poster'] as String?,
+    );

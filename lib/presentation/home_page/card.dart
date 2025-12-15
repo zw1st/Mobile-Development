@@ -1,13 +1,15 @@
 part of 'home_page.dart';
 
-typedef OnLikeCallBack = void Function(String title, bool isLiked)?;
+typedef OnLikeCallBack = void Function(String? id, String title, bool isLiked)?;
 
-class _Card extends StatefulWidget {
+class _Card extends StatelessWidget {
   final String text;
   final String textDescription;
   final String? imageUrl;
   final OnLikeCallBack onLike;
   final VoidCallback? onTap;
+  final bool isLiked;
+  final String? id;
 
   const _Card(
     this.text, {
@@ -15,29 +17,25 @@ class _Card extends StatefulWidget {
     this.imageUrl,
     this.onLike,
     this.onTap,
+    this.id,
+    this.isLiked = false,
   });
 
-  factory _Card.fromData(CardData data,
-          {OnLikeCallBack onLike, VoidCallback? onTap}) =>
-      _Card(
+  factory _Card.fromData(CardData data, {OnLikeCallBack onLike, VoidCallback? onTap, bool isLiked = false}) => _Card(
         data.text,
         textDescription: data.textDescription,
         imageUrl: data.imageUrl,
         onLike: onLike,
         onTap: onTap,
+        isLiked: isLiked,
+        id: data.id,
       );
 
-  @override
-  State<_Card> createState() => _CardState();
-}
-
-class _CardState extends State<_Card> {
-  bool isLiked = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Container(
         constraints: const BoxConstraints(minHeight: 150),
         margin: const EdgeInsets.only(top: 16),
@@ -68,7 +66,7 @@ class _CardState extends State<_Card> {
                   height: double.infinity,
                   width: 120,
                   child: Image.network(
-                    widget.imageUrl ?? '',
+                    imageUrl ?? '',
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => const Placeholder(),
                   ),
@@ -81,30 +79,23 @@ class _CardState extends State<_Card> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.text,
+                        text,
                         style: Theme.of(context).textTheme.headlineLarge,
                       ),
                       Text(
-                        widget.textDescription,
+                        textDescription,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
                   ),
                 ),
               ),
-
-
               Align(
                 alignment: AlignmentGeometry.bottomRight,
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isLiked = !isLiked;
-                        });
-                        widget.onLike?.call(widget.text, isLiked);
-                      },
+                      onTap: () => onLike?.call(id, text, isLiked),
                       child: AnimatedSwitcher(
                         duration: const Duration(microseconds: 1000),
                         child: isLiked

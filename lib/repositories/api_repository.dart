@@ -1,5 +1,5 @@
 import '../domain/models/card.dart';
 
-abstract class ApiInterface{
+abstract class ApiInterface {
   Future<List<CardData>?> loadData();
 }
